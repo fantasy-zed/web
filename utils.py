@@ -4,6 +4,9 @@ author:fantasy
 time: 2018/12/07
 desc:
 """
+import web
+import re
+
 
 def CreateLogger(logName):
     import logging
@@ -13,7 +16,7 @@ def CreateLogger(logName):
     # 创建handler
     fh = logging.FileHandler(logName, "a", encoding="utf-8")
     # 创建日志格式
-    fmt = logging.Formatter(fmt="%(asctime)s %(levelname)s [func:%(funcName)s] %(message)s",
+    fmt = logging.Formatter(fmt="%(asctime)s [%(lineno)d] %(levelname)s [func:%(funcName)s] %(message)s",
                             datefmt='%Y-%m-%d %H:%M:%S %a')
     # 为handler指定输出格式
     fh.setFormatter(fmt)
@@ -43,3 +46,19 @@ def SendMail(msg_to, msg_from, subject, content, passwd):
         print(fp.getvalue())
     finally:
         s.quit()
+
+
+def GetClientIP():
+    remote_addr = str(web.ctx.ip)
+    x_forwarded_for = str(web.ctx.env.get('HTTP_X_FORWARDED_FOR', None))
+    if not x_forwarded_for:
+        return remote_addr
+    client_ip = x_forwarded_for.split(', ')[0]
+    if CheckIP(client_ip):
+        return client_ip
+    return remote_addr
+
+
+def CheckIP(strIP):
+    return bool(
+        re.match(r"^((?:(?:25[0-5]|2[0-4]\d|((1\d{2})|([1-9]?\d)))\.){3}(?:25[0-5]|2[0-4]\d|((1\d{2})|([1-9]?\d))))$", strIP, re.VERBOSE))

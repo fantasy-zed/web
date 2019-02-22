@@ -25,30 +25,32 @@ urls = (
 class index:
 
     def GET(self):
-        import smtplib
-        from email.mime.text import MIMEText
-        msg_from = ''  # 发送方邮箱
-        passwd = ''  # 填入发送方邮箱的授权码
-        msg_to = ''  # 收件人邮箱
-        subject = "范特西python邮件测试"  # 主题
-        content = "这是我使用python smtplib及email模块发送的邮件测试"
-        msg = MIMEText(content, "plain", "utf8")
-        msg['Subject'] = subject
-        msg['From'] = msg_from
-        msg['To'] = msg_to
-        s = None
-        try:
-            s = smtplib.SMTP_SSL("smtp.163.com", 465)
-            s.login(msg_from, passwd)
-            s.sendmail(msg_from, msg_to, msg.as_string())
-            print("发送成功")
-        except Exception:
-            import io, traceback
-            fp = io.StringIO()
-            traceback.print_exc(file=fp)
-            print(fp.getvalue())
-        finally:
-            s.quit()
+        client_ip = utils.GetClientIP()
+        logf.info("client ip" + str(client_ip))
+        # import smtplib
+        # from email.mime.text import MIMEText
+        # msg_from = ''  # 发送方邮箱
+        # passwd = ''  # 填入发送方邮箱的授权码
+        # msg_to = ''  # 收件人邮箱
+        # subject = "范特西python邮件测试"  # 主题
+        # content = "这是我使用python smtplib及email模块发送的邮件测试"
+        # msg = MIMEText(content, "plain", "utf8")
+        # msg['Subject'] = subject
+        # msg['From'] = msg_from
+        # msg['To'] = msg_to
+        # s = None
+        # try:
+        #     s = smtplib.SMTP_SSL("smtp.163.com", 465)
+        #     s.login(msg_from, passwd)
+        #     s.sendmail(msg_from, msg_to, msg.as_string())
+        #     logf.info("发送成功")
+        # except Exception:
+        #     import io, traceback
+        #     fp = io.StringIO()
+        #     traceback.print_exc(file=fp)
+        #     logf.info(fp.getvalue())
+        # finally:
+        #     s.quit()
         info = json.dumps({"code": 0, "msg": "welcome to fantasy."}, ensure_ascii=False)
         return info
 
@@ -76,7 +78,7 @@ class Handle_WX_MSG(object):
             list.sort()
             s = list[0] + list[1] + list[2]
             hashcode = hashlib.sha1(s.encode('utf-8')).hexdigest()
-            print("handle/GET func: hashcode, signature: ", hashcode, signature)
+            logf.info("handle/GET func: hashcode, signature: ", hashcode, signature)
             if hashcode == signature:
                 return echostr
             else:
@@ -87,7 +89,7 @@ class Handle_WX_MSG(object):
     def POST(self):
         try:
             webData = web.data()
-            print("Handle Post webdata is:\n", webData)
+            logf.info("Handle Post webdata is:\n", webData)
             # 打印消息体日志
             recMsg = receive.parse_xml(webData)
 
@@ -95,14 +97,13 @@ class Handle_WX_MSG(object):
                 toUser = recMsg.FromUserName
                 fromUser = recMsg.ToUserName
                 content = "欢迎关注bao笑段子"
-                print('Reply message info:\n')
-                print('toUser =', toUser)
-                print('fromUser = ', fromUser)
-                print('content = ', content)
+                logf.info('Reply message info:\n')
+                logf.info('toUser =', toUser)
+                logf.info('fromUser = ', fromUser)
+                logf.info('content = ', content)
                 return self.render.reply_text(toUser, fromUser, int(time.time()), content)
             else:
-                print("不支持的消息类型：", recMsg.MsgType)
-                return "success"
+                logf.info("不支持的消息类型：", recMsg.MsgType)
         except (Exception) as Argment:
             return Argment
 
