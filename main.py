@@ -94,7 +94,7 @@ class Handle_WX_MSG(object):
             if isinstance(recMsg, receive.Msg) and recMsg.MsgType == 'text':
                 toUser = recMsg.FromUserName
                 fromUser = recMsg.ToUserName
-                content = "欢迎关注云Fantasy" + str(recMsg.Content)
+                content = "欢迎关注bao笑段子"
                 print('Reply message info:\n')
                 print('toUser =', toUser)
                 print('fromUser = ', fromUser)
