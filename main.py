@@ -92,7 +92,6 @@ class Handle_WX_MSG(object):
             logf.info("Handle Post webdata is:\n", webData)
             # 打印消息体日志
             recMsg = receive.parse_xml(webData)
-
             if isinstance(recMsg, receive.Msg) and recMsg.MsgType == 'text':
                 toUser = recMsg.FromUserName
                 fromUser = recMsg.ToUserName
@@ -104,8 +103,8 @@ class Handle_WX_MSG(object):
                 return self.render.reply_text(toUser, fromUser, int(time.time()), content)
             else:
                 logf.info("不支持的消息类型：", recMsg.MsgType)
-        except (Exception) as Argment:
-            return Argment
+        except (Exception) as e:
+            utils.print_error(self.__class__.__name__, logf)
 
 
 # 404

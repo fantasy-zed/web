@@ -62,3 +62,12 @@ def GetClientIP():
 def CheckIP(strIP):
     return bool(
         re.match(r"^((?:(?:25[0-5]|2[0-4]\d|((1\d{2})|([1-9]?\d)))\.){3}(?:25[0-5]|2[0-4]\d|((1\d{2})|([1-9]?\d))))$", strIP, re.VERBOSE))
+
+
+def print_error(className, logger):
+    import StringIO, traceback, sys
+    logger.error(
+        className + ',' + 'exception:' + str(sys.exc_info()[0]) + ',' + str(sys.exc_info()[1]))
+    fp = StringIO.StringIO()
+    traceback.print_exc(file=fp)
+    logger.error(className + ',' + fp.getvalue())
