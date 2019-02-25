@@ -13,7 +13,7 @@ import os
 import utils
 
 #
-logf = utils.CreateLogger("helloworld.log")
+logf = utils.CreateLogger("main.log")
 
 # url和对应的处理类
 urls = (
