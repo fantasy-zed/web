@@ -73,7 +73,6 @@ class Handle_WX_MSG(object):
             nonce = data.nonce
             echostr = data.echostr
             token = "fantasyisnotfantasy"
-
             list = [token, timestamp, nonce]
             list.sort()
             s = list[0] + list[1] + list[2]
@@ -84,6 +83,7 @@ class Handle_WX_MSG(object):
             else:
                 return echostr
         except (Exception) as Argument:
+            logf.info(Argument, exc_info=1)
             return Argument
 
     def POST(self):
@@ -92,11 +92,10 @@ class Handle_WX_MSG(object):
             logf.info("Handle Post webdata is: {}".format(webData))
             # 打印消息体日志
             recMsg = receive.parse_xml(webData)
-
             if isinstance(recMsg, receive.Msg) and recMsg.MsgType == 'text':
                 toUser = recMsg.FromUserName
                 fromUser = recMsg.ToUserName
-                content = "欢迎关注bao笑段子"
+                content = "欢迎关注yyy"
                 logf.info('Reply message info:\n')
                 logf.info('toUser =', toUser)
                 logf.info('fromUser = ', fromUser)
@@ -104,8 +103,9 @@ class Handle_WX_MSG(object):
                 return self.render.reply_text(toUser, fromUser, int(time.time()), content)
             else:
                 logf.info("不支持的消息类型：", recMsg.MsgType)
-        except (Exception) as Argment:
-            return Argment
+        except (Exception) as Argument:
+            logf.info(Argument, exc_info=1)
+            return Argument
 
 
 # 404
