@@ -11,6 +11,7 @@ import smtplib
 from email.mime.text import MIMEText
 
 
+
 def CreateLogger(logName):
     # 初始化日志器
     log = logging.getLogger('log')

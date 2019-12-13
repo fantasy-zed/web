@@ -11,9 +11,18 @@ import receive
 import time
 import os
 import utils
+import logging.handlers
 
-#
-logf = utils.CreateLogger("main.log")
+
+log = logging.getLogger(__name__)
+log.setLevel(logging.DEBUG)
+rotate_fh = logging.handlers.RotatingFileHandler(filename="/var/www/normal/log/wxpublic.log", maxBytes=50 * 1024 * 1024, backupCount=9)
+# 创建日志格式
+fmt = logging.Formatter(fmt="%(asctime)s %(levelname)s %(lineno)d %(message)s", datefmt='%Y-%m-%d %H:%M:%S')
+# 为handler指定输出格式
+rotate_fh.setFormatter(fmt)
+log.addHandler(rotate_fh)
+
 
 # url和对应的处理类
 urls = (
@@ -26,7 +35,7 @@ class index:
 
     def GET(self):
         client_ip = utils.GetClientIP()
-        logf.info("client ip" + str(client_ip))
+        log.info("client ip" + str(client_ip))
         # import smtplib
         # from email.mime.text import MIMEText
         # msg_from = ''  # 发送方邮箱
@@ -77,34 +86,34 @@ class Handle_WX_MSG(object):
             list.sort()
             s = list[0] + list[1] + list[2]
             hashcode = hashlib.sha1(s.encode('utf-8')).hexdigest()
-            logf.info("handle /GET func: hashcode:{} signature:{}".format(hashcode, signature))
+            log.info("handle /GET func: hashcode:{} signature:{}".format(hashcode, signature))
             if hashcode == signature:
                 return echostr
             else:
                 return echostr
         except (Exception) as Argument:
-            logf.info(Argument, exc_info=1)
+            log.info(Argument, exc_info=1)
             return Argument
 
     def POST(self):
         try:
             webData = web.data()
-            logf.info("Handle Post webdata is: {}".format(webData))
+            log.info("Handle Post webdata is: {}".format(webData))
             # 打印消息体日志
             recMsg = receive.parse_xml(webData)
             if isinstance(recMsg, receive.Msg) and recMsg.MsgType == 'text':
                 toUser = recMsg.FromUserName
                 fromUser = recMsg.ToUserName
                 content = "欢迎关注yyy"
-                logf.info('Reply message info:\n')
-                logf.info('toUser =', toUser)
-                logf.info('fromUser = ', fromUser)
-                logf.info('content = ', content)
+                log.info('Reply message info:\n')
+                log.info('toUser =', toUser)
+                log.info('fromUser = ', fromUser)
+                log.info('content = ', content)
                 return self.render.reply_text(toUser, fromUser, int(time.time()), content)
             else:
-                logf.info("不支持的消息类型：", recMsg.MsgType)
+                log.info("不支持的消息类型：", recMsg.MsgType)
         except (Exception) as Argument:
-            logf.info(Argument, exc_info=1)
+            log.info(Argument, exc_info=1)
             return Argument
 
 
@@ -113,6 +122,11 @@ def notfound():
     return web.notfound('the page you are looking for is not exist!')
 
 
+app = web.application(urls, globals(), autoreload=False)
+
+
 if __name__ == '__main__':
-    app = web.application(urls, globals())
     app.run()
+else:
+    # 实现一个WSGI兼容的接口供WSGI服务器调用
+    application = app.wsgifunc()
